@@ -1,0 +1,187 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        07/22/2017  10:24:55  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+E:\MYPROGRAM\MCU\KEIL\C51\BIN\BL51.EXE STARTUP.obj, test.obj TO test RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  STARTUP.obj (?C_STARTUP)
+  test.obj (TEST)
+  E:\MYPROGRAM\MCU\KEIL\C51\LIB\C51S.LIB (?C_INIT)
+  E:\MYPROGRAM\MCU\KEIL\C51\LIB\C51S.LIB (?C?LMUL)
+  E:\MYPROGRAM\MCU\KEIL\C51\LIB\C51S.LIB (?C?ULDIV)
+
+
+LINK MAP OF MODULE:  test (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0005H     UNIT         ?DT?TEST
+            IDATA   000DH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0008H     UNIT         ?CO?TEST
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     011DH     UNIT         ?C?LIB_CODE
+            CODE    012BH     008CH     UNIT         ?C_C51STARTUP
+            CODE    01B7H     0069H     UNIT         ?PR?ITRPTT0?TEST
+            CODE    0220H     0020H     UNIT         ?PR?_STARTMOTOR?TEST
+            CODE    0240H     001CH     UNIT         ?PR?MAIN?TEST
+            CODE    025CH     000AH     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   test (?C_STARTUP)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?TEST
+  +--> ?C_INITSEG
+
+?PR?MAIN?TEST
+  +--> ?PR?_STARTMOTOR?TEST
+
+*** NEW ROOT ***************************************************
+
+?PR?ITRPTT0?TEST
+  +--> ?CO?TEST
+
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      07/22/2017  10:24:55  PAGE 2
+
+
+
+SYMBOL TABLE OF MODULE:  test (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:012BH         SEGMENT       ?C_C51STARTUP
+  I:000DH         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:012EH         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:012BH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:012BH         LINE#         133
+  C:012DH         LINE#         134
+  C:012EH         LINE#         135
+  C:012FH         LINE#         136
+  C:0131H         LINE#         185
+  C:0134H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        TEST
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  B:00A8H.7       PUBLIC        EA
+  D:00A8H         PUBLIC        IE
+  D:0009H         PUBLIC        beats
+  D:00B8H         PUBLIC        IP
+  C:0220H         PUBLIC        _StartMotor
+  C:0240H         PUBLIC        main
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  C:01B7H         PUBLIC        itrptT0
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+BL51 BANKED LINKER/LOCATER V6.22                                                      07/22/2017  10:24:55  PAGE 3
+
+
+  B:0088H.4       PUBLIC        TR0
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          MAIN
+  C:0240H         LINE#         10
+  C:0240H         LINE#         11
+  C:0240H         LINE#         12
+  C:0242H         LINE#         13
+  C:0245H         LINE#         14
+  C:0248H         LINE#         15
+  C:024BH         LINE#         16
+  C:024DH         LINE#         17
+  C:024FH         LINE#         18
+  C:025AH         LINE#         19
+  -------         ENDPROC       MAIN
+  -------         PROC          _STARTMOTOR
+  D:0004H         SYMBOL        angle
+  C:0220H         LINE#         22
+  C:0220H         LINE#         23
+  C:0220H         LINE#         24
+  C:0222H         LINE#         25
+  C:023DH         LINE#         26
+  C:023FH         LINE#         27
+  -------         ENDPROC       _STARTMOTOR
+  -------         PROC          ITRPTT0
+  -------         DO            
+  C:0003H         SYMBOL        stpMotor
+  D:0007H         SYMBOL        tmp
+  D:0008H         SYMBOL        index
+  -------         ENDDO         
+  C:01B7H         LINE#         29
+  C:01CAH         LINE#         35
+  C:01CDH         LINE#         36
+  C:01D0H         LINE#         37
+  C:01DEH         LINE#         38
+  C:01DEH         LINE#         39
+  C:01E0H         LINE#         40
+  C:01E3H         LINE#         41
+  C:01EBH         LINE#         42
+  C:01EDH         LINE#         43
+  C:01EFH         LINE#         44
+  C:01F2H         LINE#         45
+  C:020AH         LINE#         46
+  C:020CH         LINE#         48
+  C:020CH         LINE#         49
+  C:020FH         LINE#         50
+  C:020FH         LINE#         51
+  -------         ENDPROC       ITRPTT0
+  -------         ENDMOD        TEST
+
+  -------         MODULE        ?C?LMUL
+  C:000EH         PUBLIC        ?C?LMUL
+  -------         ENDMOD        ?C?LMUL
+
+  -------         MODULE        ?C?ULDIV
+  C:0099H         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+BL51 BANKED LINKER/LOCATER V6.22                                                      07/22/2017  10:24:55  PAGE 4
+
+
+
+Program Size: data=14.0 xdata=0 code=614
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

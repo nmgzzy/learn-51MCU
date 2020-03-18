@@ -1,0 +1,59 @@
+C51 COMPILER V9.00   流水灯                                                                04/04/2017 21:43:25 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE 流水灯
+OBJECT MODULE PLACED IN 流水灯.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE 流水灯.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          #define uint unsigned int
+   4          #define uchar unsigned char
+   5          
+   6          void delay(int n);
+   7          
+   8          sbit D0 = P1^0;
+   9          sbit D1 = P1^1;
+  10          sbit D2 = P1^2;
+  11          sbit D3 = P1^3;
+  12          sbit D4 = P1^4;
+  13          sbit D5 = P1^5;
+  14          sbit D6 = P1^6;
+  15          sbit D7 = P1^7;
+  16          
+  17          void main()
+  18          {
+  19   1              uchar cnt=0;
+  20   1              while(1)
+  21   1              {
+  22   2                      P1=~(0x01<<cnt);
+  23   2                      delay(20000);
+  24   2                      cnt++;
+  25   2                      if(cnt>=8)
+  26   2                      {
+  27   3                              cnt=0;
+  28   3                      }
+  29   2              }
+  30   1      }
+  31          
+  32          void delay(int n)
+  33           {
+  34   1              int i;
+  35   1              for (i = 0; i < n; i++);
+  36   1       }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     64    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

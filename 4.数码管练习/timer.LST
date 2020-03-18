@@ -1,0 +1,57 @@
+C51 COMPILER V9.00   TIMER                                                                 04/16/2017 22:51:41 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN timer.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE timer.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #define uchar unsigned char
+   3          
+   4          code unsigned char digseg[]={0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90,0x88,0x83,0xC6,0xA1,0x86,0x
+             -8E};
+   5                                   //   0    1    2    3    4    5    6    7    8    9    A    b    C    d    E    F
+   6          code unsigned char segsel[]={0xfe,0xfd,0xfb,0xf7};
+   7                                  //สýย๋นÜถฮัก 
+   8          
+   9          sbit CE573=P2^5;
+  10          void delay(int n)
+  11          {
+  12   1              int i;
+  13   1              for(i=0; i<n; i++);
+  14   1      }
+  15          void main()
+  16          {
+  17   1              int i,j;        
+  18   1              while(1)
+  19   1              {
+  20   2                      CE573=1;
+  21   2                      for(i=0; i<16; i++)
+  22   2                      {
+  23   3                              for(j=0; j<4; j++)
+  24   3                              {
+  25   4                                      P2=segsel[j];
+  26   4                                      P0=digseg[i];
+  27   4                                      delay(1000);
+  28   4                              }
+  29   3                              delay(40000);
+  30   3                      }
+  31   2              }
+  32   1      }
+  33          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    110    ----
+   CONSTANT SIZE    =     20    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

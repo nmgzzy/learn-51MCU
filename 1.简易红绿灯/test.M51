@@ -1,0 +1,211 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        04/02/2017  22:24:03  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+E:\MYPROGRAM\MCU\KEIL\C51\BIN\BL51.EXE STARTUP.obj, test.obj TO test RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  STARTUP.obj (?C_STARTUP)
+  test.obj (TEST)
+  E:\MYPROGRAM\MCU\KEIL\C51\LIB\C51S.LIB (?C?ULCMP)
+
+
+LINK MAP OF MODULE:  test (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     000AH     UNIT         _DATA_GROUP_
+            IDATA   0012H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     004FH     UNIT         ?PR?_DELAY?TEST
+            CODE    0052H     0046H     UNIT         ?PR?MAIN?TEST
+            CODE    0098H     0021H     UNIT         ?PR?FLICKER3?TEST
+            CODE    00B9H     0021H     UNIT         ?PR?FLICKER6?TEST
+            CODE    00DAH     0011H     UNIT         ?C?LIB_CODE
+            CODE    00EBH     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   test (?C_STARTUP)
+
+
+SEGMENT                          DATA_GROUP 
+  +--> CALLED SEGMENT          START    LENGTH
+----------------------------------------------
+?C_C51STARTUP                  -----    -----
+  +--> ?PR?MAIN?TEST
+
+?PR?MAIN?TEST                  -----    -----
+  +--> ?PR?_DELAY?TEST
+  +--> ?PR?FLICKER3?TEST
+  +--> ?PR?FLICKER6?TEST
+
+?PR?_DELAY?TEST                000AH    0008H
+
+?PR?FLICKER3?TEST              0008H    0002H
+  +--> ?PR?_DELAY?TEST
+
+?PR?FLICKER6?TEST              0008H    0002H
+  +--> ?PR?_DELAY?TEST
+
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/02/2017  22:24:03  PAGE 2
+
+
+
+SYMBOL TABLE OF MODULE:  test (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:00EBH         SEGMENT       ?C_C51STARTUP
+  I:0012H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:00EEH         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:00EBH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:00EBH         LINE#         133
+  C:00EDH         LINE#         134
+  C:00EEH         LINE#         135
+  C:00EFH         LINE#         136
+  C:00F1H         LINE#         185
+  C:00F4H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        TEST
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  B:0090H.2       PUBLIC        LED3
+  B:0090H.3       PUBLIC        LED4
+  B:0090H.4       PUBLIC        LED5
+  B:0090H.5       PUBLIC        LED6
+  B:0090H.6       PUBLIC        LED7
+  B:0090H.7       PUBLIC        LED8
+  D:00A8H         PUBLIC        IE
+  C:000BH         PUBLIC        _delay
+  C:0098H         PUBLIC        flicker3
+  D:00B8H         PUBLIC        IP
+  C:00B9H         PUBLIC        flicker6
+  C:0052H         PUBLIC        main
+  D:0098H         PUBLIC        SCON
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/02/2017  22:24:03  PAGE 3
+
+
+  D:0088H         PUBLIC        TCON
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  C:0003H         SYMBOL        L?0019
+  C:0007H         SYMBOL        L?0020
+  -------         PROC          L?0018
+  -------         ENDPROC       L?0018
+  C:0003H         SYMBOL        L?0019
+  C:0007H         SYMBOL        L?0020
+  -------         PROC          _DELAY
+  D:000AH         SYMBOL        n
+  -------         DO            
+  D:000EH         SYMBOL        i
+  -------         ENDDO         
+  C:000BH         LINE#         16
+  C:0013H         LINE#         17
+  C:0013H         LINE#         18
+  C:001CH         LINE#         19
+  C:0051H         LINE#         20
+  -------         ENDPROC       _DELAY
+  -------         PROC          FLICKER3
+  -------         DO            
+  D:0008H         SYMBOL        i
+  -------         ENDDO         
+  C:0098H         LINE#         22
+  C:0098H         LINE#         23
+  C:0098H         LINE#         25
+  C:009DH         LINE#         26
+  C:009DH         LINE#         27
+  C:009FH         LINE#         28
+  C:00A2H         LINE#         29
+  C:00A4H         LINE#         30
+  C:00A7H         LINE#         31
+  C:00B8H         LINE#         32
+  -------         ENDPROC       FLICKER3
+  -------         PROC          FLICKER6
+  -------         DO            
+  D:0008H         SYMBOL        i
+  -------         ENDDO         
+  C:00B9H         LINE#         34
+  C:00B9H         LINE#         35
+  C:00B9H         LINE#         37
+  C:00BEH         LINE#         38
+  C:00BEH         LINE#         39
+  C:00C0H         LINE#         40
+  C:00C3H         LINE#         41
+  C:00C5H         LINE#         42
+  C:00C8H         LINE#         43
+  C:00D9H         LINE#         44
+  -------         ENDPROC       FLICKER6
+  -------         PROC          MAIN
+  C:0052H         LINE#         46
+  C:0052H         LINE#         47
+  C:0052H         LINE#         48
+  C:0052H         LINE#         49
+  C:0052H         LINE#         50
+  C:0054H         LINE#         51
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/02/2017  22:24:03  PAGE 4
+
+
+  C:0056H         LINE#         52
+  C:0061H         LINE#         53
+  C:0064H         LINE#         54
+  C:0066H         LINE#         55
+  C:0068H         LINE#         56
+  C:006FH         LINE#         57
+  C:0071H         LINE#         58
+  C:0073H         LINE#         59
+  C:0075H         LINE#         60
+  C:0077H         LINE#         61
+  C:0082H         LINE#         62
+  C:0085H         LINE#         63
+  C:0087H         LINE#         64
+  C:0089H         LINE#         65
+  C:0090H         LINE#         66
+  C:0092H         LINE#         67
+  C:0094H         LINE#         68
+  C:0096H         LINE#         69
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        TEST
+
+  -------         MODULE        ?C?ULCMP
+  C:00DAH         PUBLIC        ?C?ULCMP
+  -------         ENDMOD        ?C?ULCMP
+
+Program Size: data=19.0 xdata=0 code=247
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

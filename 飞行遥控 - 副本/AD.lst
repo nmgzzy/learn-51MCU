@@ -1,0 +1,133 @@
+C51 COMPILER V9.00   AD                                                                    08/31/2017 19:02:56 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE AD
+OBJECT MODULE PLACED IN .\output\AD.obj
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE source\AD.c BROWSE DEBUG OBJECTEXTEND PRINT(.\AD.lst) OBJECT(
+                    -.\output\AD.obj)
+
+line level    source
+
+   1          #include "reg51.h"
+   2          #include "intrins.h"
+   3          #define FOSC 18432000L
+   4          #define BAUD 9600
+   5          typedef unsigned char BYTE;
+   6          typedef unsigned int WORD;
+   7          /*Declare SFR associated with the ADC */
+   8          sfr ADC_CONTR = 0xBC; //ADC control register
+   9          sfr ADC_RES = 0xBD; //ADC high 8-bit result register
+  10          sfr ADC_LOW2 = 0xBE; //ADC low 2-bit result register
+  11          sfr P1ASF = 0x9D; //P1 secondary function control register
+  12          /*Define ADC operation const for ADC_CONTR*/
+  13          #define ADC_POWER 0x80 //ADC power control bit
+  14          #define ADC_FLAG 0x10 //ADC complete flag
+  15          #define ADC_START 0x08 //ADC start control bit
+  16          #define ADC_SPEEDLL 0x00 //540 clocks
+  17          #define ADC_SPEEDL 0x20 //360 clocks
+  18          #define ADC_SPEEDH 0x40 //180 clocks
+  19          #define ADC_SPEEDHH 0x60 //90 clocks
+  20          void InitUart();
+  21          void InitADC();
+  22          void SendData(BYTE dat);
+  23          BYTE GetADCResult(BYTE ch);
+  24          void Delay(WORD n);
+  25          void ShowResult(BYTE ch);
+  26          
+  27          void main()
+  28          {
+  29   1              InitUart(); //Init UART, use to show ADC result
+  30   1              InitADC(); //Init ADC sfr
+  31   1              while (1)
+  32   1              {
+  33   2                      ShowResult(0); //Show Channel0
+  34   2                      Delay(20);
+  35   2                      ShowResult(1); //Show Channel1
+  36   2                      Delay(20);
+  37   2              }
+  38   1      }
+  39          /*----------------------------
+  40          Send ADC result to UART
+  41          ----------------------------*/
+  42          void ShowResult(BYTE ch)
+  43          {
+  44   1              SendData(ch); //Show Channel NO.
+  45   1              SendData(GetADCResult(ch)); //Show ADC high 8-bit result
+  46   1              //if you want show 10-bit result, uncomment next line
+  47   1              // SendData(ADC_LOW2); //Show ADC low 2-bit result
+  48   1      }
+  49          /*----------------------------
+  50          Get ADC result
+  51          ----------------------------*/
+  52          BYTE GetADCResult(BYTE ch)
+  53          {
+  54   1              ADC_CONTR = ADC_POWER | ADC_SPEEDLL | ch | ADC_START;
+C51 COMPILER V9.00   AD                                                                    08/31/2017 19:02:56 PAGE 2   
+
+  55   1              _nop_(); //Must wait before inquiry
+  56   1              _nop_();
+  57   1              _nop_();
+  58   1              _nop_();
+  59   1              while (!(ADC_CONTR & ADC_FLAG)); //Wait complete flag
+  60   1              ADC_CONTR &= ~ADC_FLAG; //Close ADC
+  61   1              return ADC_RES; //Return ADC result
+  62   1      }
+  63          /*----------------------------
+  64          Initial UART
+  65          ----------------------------*/
+  66          void InitUart()
+  67          {
+  68   1              SCON = 0x5a; //8 bit data ,no parity bit
+  69   1              TMOD = 0x20; //T1 as 8-bit auto reload
+  70   1              TH1 = TL1 = -(FOSC/12/32/BAUD); //Set Uart baudrate
+  71   1              TR1 = 1; //T1 start running
+  72   1      }
+  73          /*----------------------------
+  74          Initial ADC sfr
+  75          ----------------------------*/
+  76          void InitADC()
+  77          {
+  78   1              P1ASF = 0x03; //Open 8 channels ADC function
+  79   1              ADC_RES = 0; //Clear previous result
+  80   1              ADC_CONTR = ADC_POWER | ADC_SPEEDLL;
+  81   1              Delay(2); //ADC power-on and delay
+  82   1      }
+  83          /*----------------------------
+  84          Send one byte data to PC
+  85          Input: dat (UART data)
+  86          Output:-
+  87          ----------------------------*/
+  88          void SendData(BYTE dat)
+  89          {
+  90   1              while (!TI); //Wait for the previous data is sent
+  91   1              TI = 0; //Clear TI flag
+  92   1              SBUF = dat; //Send current data
+  93   1      }
+  94          /*----------------------------
+  95          Software delay function
+  96          ----------------------------*/
+  97          void Delay(WORD n)
+  98          {
+  99   1              WORD x;
+ 100   1              while (n--)
+ 101   1              {
+ 102   2                      x = 5000;
+ 103   2                      while (x--);
+ 104   2              }
+ 105   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    130    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.00   AD                                                                    08/31/2017 19:02:56 PAGE 3   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

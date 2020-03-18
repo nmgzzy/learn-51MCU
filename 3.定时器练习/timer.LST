@@ -1,0 +1,56 @@
+C51 COMPILER V9.00   TIMER                                                                 04/07/2017 18:48:54 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN timer.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE timer.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #define uchar unsigned char
+   3          
+   4          void main()
+   5          {
+   6   1              uchar cnt=0;
+   7   1              uchar ct=0;
+   8   1              TMOD = 0x01;
+   9   1              TH0 = 0xB8;
+  10   1              TL0 = 0x00;
+  11   1              TR0=1;
+  12   1              while(1)
+  13   1              {
+  14   2                      if(TF0 == 1)
+  15   2                      {
+  16   3                              TF0 = 0;
+  17   3                              TH0 = 0xB8;
+  18   3                              TL0 = 0x00;
+  19   3                              ct++;
+  20   3                              if(ct==50)
+  21   3                              {
+  22   4                                      P1=~(0x01<<cnt);
+  23   4                                      cnt++;
+  24   4                                      if(cnt>=8)
+  25   4                                      {
+  26   5                                              cnt=0;
+  27   5                                      }
+  28   4                                      ct=0;
+  29   4                              }
+  30   3                      }
+  31   2              }
+  32   1      }
+  33          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     54    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

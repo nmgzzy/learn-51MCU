@@ -1,0 +1,134 @@
+C51 COMPILER V9.00   TEST                                                                  07/19/2017 20:48:45 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TEST
+OBJECT MODULE PLACED IN test.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE test.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<reg52.h>  
+   2          
+   3          sbit LeftF=P1^0;  //左轮前进 //
+   4          sbit LeftB=P1^1;  //左轮后退 //
+   5                                            //0为真        //
+   6          sbit RightF=P1^2; //右轮前进 //
+   7          sbit RightB=P1^3; //右轮后退 //
+   8          
+   9          void delay(unsigned int xms)                            
+  10          {
+  11   1              unsigned int i,j;
+  12   1              for(i=xms;i>0;i--)                    //i=xms即延时约xms毫秒
+  13   1                      for(j=112;j>0;j--);
+  14   1      }
+  15          
+  16          void run(void)  //前进
+  17          {
+  18   1          LeftF=0;
+  19   1              LeftB=1;
+  20   1              RightF=0;
+  21   1              RightB=1;
+  22   1      }
+  23          
+  24          void back(void)                   //后退函数
+  25          {
+  26   1          LeftF=1;
+  27   1              LeftB=0; 
+  28   1              RightB=0;
+  29   1              RightF=1;
+  30   1      }
+  31          
+  32          void right(void)                 //右转函数
+  33          {
+  34   1          LeftF=0;
+  35   1              LeftB=1;
+  36   1              RightB=1;
+  37   1              RightF=1;
+  38   1      }
+  39          
+  40          void left(void)                   //左转函数
+  41          {
+  42   1          LeftF=1;
+  43   1              LeftB=1; 
+  44   1              RightB=1;
+  45   1              RightF=0;
+  46   1      }
+  47          
+  48          void stop(void)                   //停止函数
+  49          {
+  50   1          LeftF=1;
+  51   1              LeftB=1;
+  52   1              RightB=1;
+  53   1              RightF=1;
+  54   1      }
+  55          
+C51 COMPILER V9.00   TEST                                                                  07/19/2017 20:48:45 PAGE 2   
+
+  56          
+  57          void spin_right(void)     //向右打转函数
+  58          {
+  59   1          LeftF=0;
+  60   1              LeftB=1;
+  61   1              RightB=0;
+  62   1              RightF=1;
+  63   1      }
+  64          
+  65          void spin_left(void)      //向左打转函数
+  66          {
+  67   1          LeftF=1;
+  68   1              LeftB=0; 
+  69   1              RightB=1;
+  70   1              RightF=0;
+  71   1      }
+  72          
+  73          
+  74          
+  75          void main(void)
+  76          {
+  77   1          delay(2000); //延时2s后启动
+  78   1          back();              
+  79   1              delay(1000); //后退1s
+  80   1              stop();          
+  81   1              delay(500);      //停止0.5s
+  82   1              run();           
+  83   1              delay(1000); //前进1s
+  84   1              stop();
+  85   1              delay(500);      //停止0.5s
+  86   1              left();
+  87   1              delay(1000); //向左转1s
+  88   1              right();
+  89   1              delay(1000); //向右转1s
+  90   1              spin_right();
+  91   1          delay(2000); //向左旋转2s
+  92   1              spin_left();
+  93   1              delay(2000); //向右旋转2s
+  94   1              stop();          //停车
+  95   1              while(1);  //死循环     复位键重新跑程序
+  96   1      }
+  97          
+  98          
+  99          
+ 100          
+ 101          
+ 102          
+ 103          
+ 104          
+ 105          
+ 106          
+ 107          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    171    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+C51 COMPILER V9.00   TEST                                                                  07/19/2017 20:48:45 PAGE 3   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

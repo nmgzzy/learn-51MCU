@@ -1,0 +1,393 @@
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>      
+   2          #include <math.h>    //Keil library  
+   3          #include <stdio.h>   //Keil library     
+   4          #include <intrins.h>
+   5          typedef unsigned char  uchar;
+   6          typedef unsigned short ushort;
+   7          typedef unsigned int   uint;
+   8          //****************************************
+   9          // 定义51单片机端口
+  10          //****************************************
+  11          #define DataPort P0                     //LCD1602数据端口
+  12          sbit    SCL=P1^0;                       //IIC时钟引脚定义
+  13          sbit    SDA=P1^1;                       //IIC数据引脚定义
+  14          sbit    LCM_RS=P2^0;            //LCD1602命令端口               
+  15          sbit    LCM_RW=P2^1;            //LCD1602命令端口               
+  16          sbit    LCM_EN=P2^2;            //LCD1602命令端口 
+  17          //****************************************
+  18          // 定义MPU6050内部地址
+  19          //****************************************
+  20          #define SMPLRT_DIV              0x19    //陀螺仪采样率，典型值：0x07(125Hz)
+  21          #define CONFIG                  0x1A    //低通滤波频率，典型值：0x06(5Hz)
+  22          #define GYRO_CONFIG             0x1B    //陀螺仪自检及测量范围，典型值：0x18(不自检，2000deg/s)
+  23          #define ACCEL_CONFIG    0x1C    //加速计自检、测量范围及高通滤波频率，典型值：0x01(不自检，2G，5Hz)
+  24          #define ACCEL_XOUT_H    0x3B
+  25          #define ACCEL_XOUT_L    0x3C
+  26          #define ACCEL_YOUT_H    0x3D
+  27          #define ACCEL_YOUT_L    0x3E
+  28          #define ACCEL_ZOUT_H    0x3F
+  29          #define ACCEL_ZOUT_L    0x40
+  30          #define TEMP_OUT_H              0x41
+  31          #define TEMP_OUT_L              0x42
+  32          #define GYRO_XOUT_H             0x43
+  33          #define GYRO_XOUT_L             0x44    
+  34          #define GYRO_YOUT_H             0x45
+  35          #define GYRO_YOUT_L             0x46
+  36          #define GYRO_ZOUT_H             0x47
+  37          #define GYRO_ZOUT_L             0x48
+  38          #define PWR_MGMT_1              0x6B    //电源管理，典型值：0x00(正常启用)
+  39          #define WHO_AM_I                0x75    //IIC地址寄存器(默认数值0x68，只读)
+  40          #define SlaveAddress    0xD0    //IIC写入时的地址字节数据，+1为读取
+  41          //****************************************
+  42          //定义类型及变量
+  43          //****************************************
+  44          uchar dis[4];                                                   //显示数字(-511至512)的字符数组
+  45          int     dis_data;                                               //变量
+  46          //int   Temperature,Temp_h,Temp_l;      //温度及高低位数据
+  47          //****************************************
+  48          //函数声明
+  49          //****************************************
+  50          void  delay(unsigned int k);                                                            //延时
+  51          //LCD相关函数
+  52          void  InitLcd();                                                                                        //初始化lcd1602
+  53          void  lcd_printf(uchar *s,int temp_data);
+  54          void  WriteDataLCM(uchar dataW);                                                        //LCD数据
+  55          void  WriteCommandLCM(uchar CMD,uchar Attribc);                         //LCD指令
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 2   
+
+  56          void  DisplayOneChar(uchar X,uchar Y,uchar DData);                      //显示一个字符
+  57          void  DisplayListChar(uchar X,uchar Y,uchar *DData,L);          //显示字符串
+  58          //MPU6050操作函数
+  59          void  InitMPU6050();                                                                            //初始化MPU6050
+  60          void  Delay5us();
+  61          void  I2C_Start();
+  62          void  I2C_Stop();
+  63          void  I2C_SendACK(bit ack);
+  64          bit   I2C_RecvACK();
+  65          void  I2C_SendByte(uchar dat);
+  66          uchar I2C_RecvByte();
+  67          void  I2C_ReadPage();
+  68          void  I2C_WritePage();
+  69          void  display_ACCEL_x();
+  70          void  display_ACCEL_y();
+  71          void  display_ACCEL_z();
+  72          uchar Single_ReadI2C(uchar REG_Address);                                                //读取I2C数据
+  73          void  Single_WriteI2C(uchar REG_Address,uchar REG_data);        //向I2C写入数据
+  74          //****************************************
+  75          //整数转字符串
+  76          //****************************************
+  77          void lcd_printf(uchar *s,int temp_data)
+  78          {
+  79   1              if(temp_data<0)
+  80   1              {
+  81   2                      temp_data=-temp_data;
+  82   2                      *s='-';
+  83   2              }
+  84   1              else *s=' ';
+  85   1              *++s =temp_data/100+0x30;
+  86   1              temp_data=temp_data%100;     //取余运算
+  87   1              *++s =temp_data/10+0x30;
+  88   1              temp_data=temp_data%10;      //取余运算
+  89   1              *++s =temp_data+0x30;   
+  90   1      }
+  91          //****************************************
+  92          //延时
+  93          //****************************************
+  94          void delay(unsigned int k)      
+  95          {                                               
+  96   1              unsigned int i,j;                               
+  97   1              for(i=0;i<k;i++)
+  98   1              {                       
+  99   2                      for(j=0;j<121;j++);
+ 100   2              }                                               
+ 101   1      }
+ 102          //****************************************
+ 103          //LCD1602初始化
+ 104          //****************************************
+ 105          void InitLcd()                          
+ 106          {                       
+ 107   1              WriteCommandLCM(0x38,1);        
+ 108   1              WriteCommandLCM(0x08,1);        
+ 109   1              WriteCommandLCM(0x01,1);        
+ 110   1              WriteCommandLCM(0x06,1);        
+ 111   1              WriteCommandLCM(0x0c,1);
+ 112   1              DisplayOneChar(0,0,'A');
+ 113   1              DisplayOneChar(0,1,'G');
+ 114   1      }                       
+ 115          //****************************************
+ 116          //LCD1602写允许
+ 117          //****************************************
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 3   
+
+ 118          void WaitForEnable(void)        
+ 119          {                                       
+ 120   1              DataPort=0xff;          
+ 121   1              LCM_RS=0;LCM_RW=1;_nop_();
+ 122   1              LCM_EN=1;_nop_();_nop_();
+ 123   1              while(DataPort&0x80);   
+ 124   1              LCM_EN=0;                               
+ 125   1      }                                       
+ 126          //****************************************
+ 127          //LCD1602写入命令
+ 128          //****************************************
+ 129          void WriteCommandLCM(uchar CMD,uchar Attribc)
+ 130          {                                       
+ 131   1              if(Attribc)WaitForEnable();     
+ 132   1              LCM_RS=0;LCM_RW=0;_nop_();
+ 133   1              DataPort=CMD;_nop_();   
+ 134   1              LCM_EN=1;_nop_();_nop_();LCM_EN=0;
+ 135   1      }                                       
+ 136          //****************************************
+ 137          //LCD1602写入数据
+ 138          //****************************************
+ 139          void WriteDataLCM(uchar dataW)
+ 140          {                                       
+ 141   1              WaitForEnable();                
+ 142   1              LCM_RS=1;LCM_RW=0;_nop_();
+ 143   1              DataPort=dataW;_nop_(); 
+ 144   1              LCM_EN=1;_nop_();_nop_();LCM_EN=0;
+ 145   1      }               
+ 146          //****************************************
+ 147          //LCD1602写入一个字符
+ 148          //****************************************
+ 149          void DisplayOneChar(uchar X,uchar Y,uchar DData)
+ 150          {                                               
+ 151   1              Y&=1;                                           
+ 152   1              X&=15;                                          
+ 153   1              if(Y)X|=0x40;                                   
+ 154   1              X|=0x80;                        
+ 155   1              WriteCommandLCM(X,0);           
+ 156   1              WriteDataLCM(DData);            
+ 157   1      }                                               
+ 158          //****************************************
+ 159          //LCD1602显示字符串
+ 160          //****************************************
+ 161          void DisplayListChar(uchar X,uchar Y,uchar *DData,L)
+ 162          {
+ 163   1              uchar ListLength=0; 
+ 164   1              Y&=0x1;                
+ 165   1              X&=0xF;                
+ 166   1              while(L--)             
+ 167   1              {                       
+ 168   2                      DisplayOneChar(X,Y,DData[ListLength]);
+ 169   2                      ListLength++;  
+ 170   2                      X++;                        
+ 171   2              }    
+ 172   1      }
+ 173          //**************************************
+ 174          //延时5微秒(STC90C52RC@12M)
+ 175          //不同的工作环境,需要调整此函数
+ 176          //当改用1T的MCU时,请调整此延时函数
+ 177          //**************************************
+ 178          void Delay5us()
+ 179          {
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 4   
+
+ 180   1              _nop_();_nop_();_nop_();_nop_();
+ 181   1              _nop_();_nop_();_nop_();_nop_();
+ 182   1              _nop_();_nop_();_nop_();_nop_();
+ 183   1              _nop_();_nop_();_nop_();_nop_();
+ 184   1              _nop_();_nop_();_nop_();_nop_();
+ 185   1              _nop_();_nop_();_nop_();_nop_();
+ 186   1      }
+ 187          //**************************************
+ 188          //I2C起始信号
+ 189          //**************************************
+ 190          void I2C_Start()
+ 191          {
+ 192   1          SDA = 1;                    //拉高数据线
+ 193   1          SCL = 1;                    //拉高时钟线
+ 194   1          Delay5us();                 //延时
+ 195   1          SDA = 0;                    //产生下降沿
+ 196   1          Delay5us();                 //延时
+ 197   1          SCL = 0;                    //拉低时钟线
+ 198   1      }
+ 199          //**************************************
+ 200          //I2C停止信号
+ 201          //**************************************
+ 202          void I2C_Stop()
+ 203          {
+ 204   1          SDA = 0;                    //拉低数据线
+ 205   1          SCL = 1;                    //拉高时钟线
+ 206   1          Delay5us();                 //延时
+ 207   1          SDA = 1;                    //产生上升沿
+ 208   1          Delay5us();                 //延时
+ 209   1      }
+ 210          //**************************************
+ 211          //I2C发送应答信号
+ 212          //入口参数:ack (0:ACK 1:NAK)
+ 213          //**************************************
+ 214          void I2C_SendACK(bit ack)
+ 215          {
+ 216   1          SDA = ack;                  //写应答信号
+ 217   1          SCL = 1;                    //拉高时钟线
+ 218   1          Delay5us();                 //延时
+ 219   1          SCL = 0;                    //拉低时钟线
+ 220   1          Delay5us();                 //延时
+ 221   1      }
+ 222          //**************************************
+ 223          //I2C接收应答信号
+ 224          //**************************************
+ 225          bit I2C_RecvACK()
+ 226          {
+ 227   1          SCL = 1;                    //拉高时钟线
+ 228   1          Delay5us();                 //延时
+ 229   1          CY = SDA;                   //读应答信号
+ 230   1          SCL = 0;                    //拉低时钟线
+ 231   1          Delay5us();                 //延时
+ 232   1          return CY;
+ 233   1      }
+ 234          //**************************************
+ 235          //向I2C总线发送一个字节数据
+ 236          //**************************************
+ 237          void I2C_SendByte(uchar dat)
+ 238          {
+ 239   1          uchar i;
+ 240   1          for (i=0; i<8; i++)         //8位计数器
+ 241   1          {
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 5   
+
+ 242   2              dat <<= 1;              //移出数据的最高位
+ 243   2              SDA = CY;               //送数据口
+ 244   2              SCL = 1;                //拉高时钟线
+ 245   2              Delay5us();             //延时
+ 246   2              SCL = 0;                //拉低时钟线
+ 247   2              Delay5us();             //延时
+ 248   2          }
+ 249   1          I2C_RecvACK();
+ 250   1      }
+ 251          //**************************************
+ 252          //从I2C总线接收一个字节数据
+ 253          //**************************************
+ 254          uchar I2C_RecvByte()
+ 255          {
+ 256   1          uchar i;
+ 257   1          uchar dat = 0;
+ 258   1          SDA = 1;                    //使能内部上拉,准备读取数据,
+ 259   1          for (i=0; i<8; i++)         //8位计数器
+ 260   1          {
+ 261   2              dat <<= 1;
+ 262   2              SCL = 1;                //拉高时钟线
+ 263   2              Delay5us();             //延时
+ 264   2              dat |= SDA;             //读数据               
+ 265   2              SCL = 0;                //拉低时钟线
+ 266   2              Delay5us();             //延时
+ 267   2          }
+ 268   1          return dat;
+ 269   1      }
+ 270          //**************************************
+ 271          //向I2C设备写入一个字节数据
+ 272          //**************************************
+ 273          void Single_WriteI2C(uchar REG_Address,uchar REG_data)
+ 274          {
+ 275   1          I2C_Start();                  //起始信号
+ 276   1          I2C_SendByte(SlaveAddress);   //发送设备地址+写信号
+ 277   1          I2C_SendByte(REG_Address);    //内部寄存器地址，
+ 278   1          I2C_SendByte(REG_data);       //内部寄存器数据，
+ 279   1          I2C_Stop();                   //发送停止信号
+ 280   1      }
+ 281          //**************************************
+ 282          //从I2C设备读取一个字节数据
+ 283          //**************************************
+ 284          uchar Single_ReadI2C(uchar REG_Address)
+ 285          {
+ 286   1              uchar REG_data;
+ 287   1              I2C_Start();                   //起始信号
+ 288   1              I2C_SendByte(SlaveAddress);    //发送设备地址+写信号
+ 289   1              I2C_SendByte(REG_Address);     //发送存储单元地址，从0开始      
+ 290   1              I2C_Start();                   //起始信号
+ 291   1              I2C_SendByte(SlaveAddress+1);  //发送设备地址+读信号
+ 292   1              REG_data=I2C_RecvByte();       //读出寄存器数据
+ 293   1              I2C_SendACK(1);                //接收应答信号
+ 294   1              I2C_Stop();                    //停止信号
+ 295   1              return REG_data;
+ 296   1      }
+ 297          //**************************************
+ 298          //初始化MPU6050
+ 299          //**************************************
+ 300          void InitMPU6050()
+ 301          {
+ 302   1              Single_WriteI2C(PWR_MGMT_1, 0x00);      //解除休眠状态
+ 303   1              Single_WriteI2C(SMPLRT_DIV, 0x07);
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 6   
+
+ 304   1              Single_WriteI2C(CONFIG, 0x06);
+ 305   1              Single_WriteI2C(GYRO_CONFIG, 0x18);
+ 306   1              Single_WriteI2C(ACCEL_CONFIG, 0x01);
+ 307   1      }
+ 308          //**************************************
+ 309          //合成数据
+ 310          //**************************************
+ 311          int GetData(uchar REG_Address)
+ 312          {
+ 313   1              char H,L;
+ 314   1              H=Single_ReadI2C(REG_Address);
+ 315   1              L=Single_ReadI2C(REG_Address+1);
+ 316   1              return (H<<8)+L;   //合成数据
+ 317   1      }
+ 318          //**************************************
+ 319          //在1602上显示10位数据
+ 320          //**************************************
+ 321          void Display10BitData(int value,uchar x,uchar y)
+ 322          {
+ 323   1              value/=64;                                                      //转换为10位数据
+ 324   1              lcd_printf(dis, value);                         //转换数据显示
+ 325   1              DisplayListChar(x,y,dis,4);                     //启始列，行，显示数组，显示长度
+ 326   1      }
+ 327          //**************************************
+ 328          //显示温度
+ 329          //**************************************
+ 330          //void display_temp()
+ 331          //{ 
+ 332          //      Temp_h=Single_ReadI2C(TEMP_OUT_H); //读取温度
+ 333          //      Temp_l=Single_ReadI2C(TEMP_OUT_L); //读取温度
+ 334          //      Temperature=Temp_h<<8|Temp_l;     //合成温度
+ 335          //      Temperature = 35+ ((double) (Temperature + 13200)) / 280; // 计算出温度
+ 336          //      lcd_printf(dis,Temperature);     //转换数据显示
+ 337          //      DisplayListChar(11,1,dis,4);     //启始列，行，显示数组，显示位数
+ 338          //}
+ 339          //*********************************************************
+ 340          //主程序
+ 341          //*********************************************************
+ 342          void main()
+ 343          { 
+ 344   1              delay(500);             //上电延时              
+ 345   1              InitLcd();              //液晶初始化
+ 346   1              InitMPU6050();  //初始化MPU6050
+ 347   1              delay(150);
+ 348   1              while(1)
+ 349   1              {
+ 350   2                      Display10BitData(GetData(ACCEL_XOUT_H),2,0);    //显示X轴加速度
+ 351   2                      Display10BitData(GetData(ACCEL_YOUT_H),7,0);    //显示Y轴加速度
+ 352   2                      Display10BitData(GetData(ACCEL_ZOUT_H),12,0);   //显示Z轴加速度
+ 353   2                      Display10BitData(GetData(GYRO_XOUT_H),2,1);             //显示X轴角速度
+ 354   2                      Display10BitData(GetData(GYRO_YOUT_H),7,1);             //显示Y轴角速度
+ 355   2                      Display10BitData(GetData(GYRO_ZOUT_H),12,1);    //显示Z轴角速度
+ 356   2                      delay(500);
+ 357   2              }
+ 358   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    802    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+C51 COMPILER V9.00   MAIN                                                                  10/06/2017 14:08:43 PAGE 7   
+
+   DATA SIZE        =      6      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,106 @@
+C51 COMPILER V9.00   TIMER                                                                 04/16/2017 23:27:54 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN timer.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE timer.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #define uchar unsigned char
+   3          #define uint unsigned int
+   4          
+   5          code unsigned char digseg[10]={0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90};
+   6                                   //     0    1    2    3    4    5    6    7    8    9  
+   7          code unsigned char segsel[4]={0xfe,0xfd,0xfb,0xf7};
+   8                                  //ÊýÂë¹Ü¶ÎÑ¡ 
+   9          unsigned char LedBuff[4]={0xFF, 0xFF, 0xFF, 0xFF};
+  10          sbit CE573=P2^5;
+  11          unsigned char flag1s = 0;
+  12          
+  13          void main()
+  14          {
+  15   1              unsigned long sec = 0;
+  16   1              TMOD = 0x01;
+  17   1              TH0 = 0xFC;
+  18   1              TL0 = 0x66;
+  19   1              TR0 = 1;
+  20   1              EA = 1;
+  21   1              ET0 = 1;
+  22   1              while(1)
+  23   1              {       
+  24   2                      if(flag1s == 1)           
+  25   2                      {
+  26   3                              flag1s = 0;
+  27   3                              sec++;
+  28   3                              if(sec/10==0)
+  29   3                              {
+  30   4                                      LedBuff[0] = digseg[sec%10];
+  31   4                                      LedBuff[1] = 0xff;
+  32   4                                      LedBuff[2] = 0xff;
+  33   4                                      LedBuff[3] = 0xff;
+  34   4                              }
+  35   3                              else if(sec/100==0)
+  36   3                              {
+  37   4                                      LedBuff[0] = digseg[sec%10];
+  38   4                                      LedBuff[1] = digseg[sec/10%10];
+  39   4                                      LedBuff[2] = 0xff;
+  40   4                                      LedBuff[3] = 0xff;
+  41   4                              }
+  42   3                              else if(sec/100==0)
+  43   3                              {
+  44   4                                      LedBuff[0] = digseg[sec%10];
+  45   4                                      LedBuff[1] = digseg[sec/10%10];
+  46   4                                      LedBuff[2] = digseg[sec/100%10];
+  47   4                                      LedBuff[3] = 0xff;
+  48   4                              }
+  49   3                              else
+  50   3                              {
+  51   4                                      LedBuff[0] = digseg[sec%10];
+  52   4                                      LedBuff[1] = digseg[sec/10%10];
+  53   4                                      LedBuff[2] = digseg[sec/100%10];
+  54   4                                      LedBuff[3] = digseg[sec/1000%10];
+  55   4                              }
+C51 COMPILER V9.00   TIMER                                                                 04/16/2017 23:27:54 PAGE 2   
+
+  56   3                      }                       
+  57   2              }
+  58   1      }
+  59          
+  60          void InterruptTime0() interrupt 1               
+  61          {
+  62   1               static uchar i = 0;
+  63   1               static uint cnt = 0;
+  64   1               TH0 = 0xFC;
+  65   1               TL0 = 0x66;
+  66   1               cnt++;
+  67   1               if(cnt >= 1000)
+  68   1               {
+  69   2                      cnt = 0;
+  70   2                      flag1s = 1;
+  71   2               }
+  72   1               P0 = 0xFF;
+  73   1           switch(i)
+  74   1               {
+  75   2                       case 0: P2=segsel[3]; P0=LedBuff[0]; i++;break;
+  76   2                       case 1: P2=segsel[2]; P0=LedBuff[1]; i++;break;
+  77   2                       case 2: P2=segsel[1]; P0=LedBuff[2]; i++;break;
+  78   2                       case 3: P2=segsel[0]; P0=LedBuff[3]; i=0;break;
+  79   2                       default:break;
+  80   2               }
+  81   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    635    ----
+   CONSTANT SIZE    =     14    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

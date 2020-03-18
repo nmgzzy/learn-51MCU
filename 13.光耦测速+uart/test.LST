@@ -1,0 +1,127 @@
+C51 COMPILER V9.00   TEST                                                                  08/03/2017 23:13:56 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TEST
+OBJECT MODULE PLACED IN test.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE test.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          sbit out = P0^1;
+   4          
+   5          unsigned int rad = 0;
+   6          unsigned char T0RH = 0;  //T0重载值的高字节
+   7          unsigned char T0RL = 0;  //T0重载值的低字节
+   8          bit flag1s = 0;
+   9          
+  10          void ConfigTimer0();
+  11          void ConfigUART(unsigned int baud);
+  12          void action1s();
+  13          unsigned char keysta = 1;
+  14          
+  15          void main()
+  16          {
+  17   1              bit keybk=1;
+  18   1              EA = 1;   //使能总中断
+  19   1          ConfigTimer0();   //配置T0定时1ms
+  20   1          ConfigUART(9600);  //配置波特率为9600
+  21   1              while(1)
+  22   1              {
+  23   2                      if(flag1s)
+  24   2                      {
+  25   3                              action1s();
+  26   3                      }
+  27   2                      if(keysta != keybk)
+  28   2                      {
+  29   3                              if(keybk == 0)
+  30   3                              {
+  31   4                                      rad++;
+  32   4                              }
+  33   3                              keybk=keysta;
+  34   3                      }       
+  35   2              }
+  36   1      }
+  37          
+  38          void action1s()
+  39          {
+  40   1              flag1s = 0;
+  41   1              SBUF = rad;
+  42   1              rad = 0;
+  43   1      }
+  44          
+  45          void ConfigTimer0()
+  46          {
+  47   1          T0RH = 0xFE;
+  48   1          T0RL = 0x8F;
+  49   1          TMOD &= 0xF0;   //清零T0的控制位
+  50   1          TMOD |= 0x01;   //配置T0为模式1
+  51   1          TH0 = T0RH;     //加载T0重载值
+  52   1          TL0 = T0RL;
+  53   1          ET0 = 1;        //使能T0中断
+  54   1          TR0 = 1;        //启动T0
+  55   1      }
+C51 COMPILER V9.00   TEST                                                                  08/03/2017 23:13:56 PAGE 2   
+
+  56          
+  57          void ConfigUART(unsigned int baud)
+  58          {
+  59   1          SCON  = 0x50;  //配置串口为模式1
+  60   1          TMOD &= 0x0F;  //清零T1的控制位
+  61   1          TMOD |= 0x20;  //配置T1为模式2
+  62   1          TH1 = 256 - (11059200/12/32)/baud;  //计算T1重载值
+  63   1          TL1 = TH1;     //初值等于重载值
+  64   1          ET1 = 0;       //禁止T1中断
+  65   1          ES  = 1;       //使能串口中断
+  66   1          TR1 = 1;       //启动T1
+  67   1      }
+  68          
+  69          void InterruptTimer0() interrupt 1
+  70          {
+  71   1              static unsigned int cnt=0;
+  72   1              static unsigned char keybf = 0xff;
+  73   1          TH0 = T0RH;  //重新加载重载值
+  74   1          TL0 = T0RL;
+  75   1          keybf = (keybf<<1)|out;
+  76   1              if(keybf == 0x00)
+  77   1              {
+  78   2                      keysta = 0;
+  79   2              }
+  80   1              else if(keybf == 0xff)
+  81   1              {
+  82   2                      keysta = 1;
+  83   2              }
+  84   1              cnt++;
+  85   1              if(cnt>=2500) 
+  86   1              {
+  87   2                      cnt=0;
+  88   2                      flag1s=1;
+  89   2              }  
+  90   1      }
+  91          
+  92          void InterruptUART() interrupt 4
+  93          {
+  94   1              if(RI)
+  95   1              {
+  96   2                      RI = 0;
+  97   2              }
+  98   1              if(TI)
+  99   1              {
+ 100   2                      TI = 0;
+ 101   2              }
+ 102   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    205    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

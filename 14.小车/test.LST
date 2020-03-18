@@ -1,0 +1,236 @@
+C51 COMPILER V9.00   TEST                                                                  07/15/2017 14:05:30 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE TEST
+OBJECT MODULE PLACED IN test.OBJ
+COMPILER INVOKED BY: E:\MyProgram\MCU\keil\C51\BIN\C51.EXE test.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #define uchar unsigned char
+   3          #define uint unsigned int
+   4          
+   5          sbit lf = P1^0; //cheng
+   6          sbit lb = P1^1; //huang
+   7          sbit rf = P1^2; //zong
+   8          sbit rb = P1^3; //hong
+   9          uchar *PWMout0;
+  10          uchar *PWMout1;
+  11          uchar LHighRH = 0;
+  12          uchar LHighRL = 0;
+  13          uchar LLowRH = 0;
+  14          uchar LLowRL = 0;
+  15          uchar RHighRH = 0;
+  16          uchar RHighRL = 0;
+  17          uchar RLowRH = 0;
+  18          uchar RLowRL = 0;
+  19          
+  20          void CfgLeftPWM(uint fr, uchar dc);
+  21          void ClsPWM();
+  22          void stop();
+  23          void fd_f();
+  24          void fd_s();
+  25          void left();
+  26          void right();
+  27          void left_fd();
+  28          void right_fd();
+  29          void back_f();
+  30          void back_s();
+  31          void left_bk();
+  32          void right_bk();
+  33          
+  34          void main()
+  35          {
+  36   1              EA = 1;
+  37   1              while(1)
+  38   1              {
+  39   2                      //switch()
+  40   2                      //case
+  41   2              }
+  42   1      }
+  43          
+  44          void InterruptTime0() interrupt 1               
+  45          {
+  46   1              if(*PWMout0 == 1)
+  47   1              {
+  48   2                      TH0 = LLowRH;
+  49   2                      TL0 = LLowRL;
+  50   2                      *PWMout0 = 0;
+  51   2              }
+  52   1              else
+  53   1              {
+  54   2                      TH0 = LHighRH;
+  55   2                      TL0 = LHighRL;
+C51 COMPILER V9.00   TEST                                                                  07/15/2017 14:05:30 PAGE 2   
+
+  56   2                      *PWMout0 = 1;
+  57   2              }        
+  58   1      }
+  59          
+  60          void InterruptTime1() interrupt 3               
+  61          {
+  62   1              if(*PWMout1 == 1)
+  63   1              {
+  64   2                      TH1 = RLowRH;
+  65   2                      TL1 = RLowRL;
+  66   2                      *PWMout1 = 0;
+  67   2              }
+  68   1              else
+  69   1              {
+  70   2                      TH1 = RHighRH;
+  71   2                      TL1 = RHighRL;
+  72   2                      *PWMout1 = 1;
+  73   2              }        
+  74   1      }
+  75          
+  76          void CfgLeftPWM(uint fr, uchar dc)
+  77          {
+  78   1              unsigned long tmp;
+  79   1              unsigned int high,low;
+  80   1              tmp = 11059200/12/fr;
+  81   1              high = (tmp*dc)/100;
+  82   1              low = tmp - high;
+  83   1              high = 65536 - high + 12;
+  84   1              low = 65536 - low + 12;
+  85   1              LHighRH = (uchar)(high >> 8);
+  86   1              LHighRL = (uchar)high;
+  87   1              LLowRH = (uchar)(low >> 8);
+  88   1              LLowRL = (uchar)low;
+  89   1              TMOD &= 0xF0;
+  90   1              TMOD |= 0x01;
+  91   1              TH0 = LHighRH;
+  92   1              TL0 = LHighRL;
+  93   1              ET0 = 1;
+  94   1              TR0 = 1;
+  95   1      }
+  96          
+  97          void CfgRightPWM(uint fr, uchar dc)
+  98          {
+  99   1              unsigned long tmp;
+ 100   1              unsigned int high,low;
+ 101   1              tmp = 11059200/12/fr;
+ 102   1              high = (tmp*dc)/100;
+ 103   1              low = tmp - high;
+ 104   1              high = 65536 - high + 12;
+ 105   1              low = 65536 - low + 12;
+ 106   1              RHighRH = (uchar)(high >> 8);
+ 107   1              RHighRL = (uchar)high;
+ 108   1              RLowRH = (uchar)(low >> 8);
+ 109   1              RLowRL = (uchar)low;
+ 110   1              TMOD &= 0x0F;
+ 111   1              TMOD |= 0x10;
+ 112   1              TH1 = RHighRH;
+ 113   1              TL1 = RHighRL;
+ 114   1              ET1 = 1;
+ 115   1              TR1 = 1;        
+ 116   1      }
+ 117          
+C51 COMPILER V9.00   TEST                                                                  07/15/2017 14:05:30 PAGE 3   
+
+ 118          void ClsPWM()
+ 119          {
+ 120   1              TR0 = 0;
+ 121   1              ET0 = 0;
+ 122   1              TR1 = 0;
+ 123   1              ET1 = 0;
+ 124   1              *PWMout0 = 1;
+ 125   1              *PWMout1 = 1;
+ 126   1      }
+ 127          
+ 128          void stop()
+ 129          {
+ 130   1              ClsPWM();
+ 131   1              lf = 1;
+ 132   1              rf = 1;
+ 133   1              lb = 1;
+ 134   1              rb = 1;
+ 135   1      }
+ 136          
+ 137          void fd_f()
+ 138          {
+ 139   1              ClsPWM();
+ 140   1              lb = 1;
+ 141   1              rb = 1;
+ 142   1              lf = 0;
+ 143   1              rf = 0;
+ 144   1      }
+ 145          
+ 146          void fd_s()
+ 147          {
+ 148   1              ClsPWM();
+ 149   1              lb = 1;
+ 150   1              rb = 1;
+ 151   1              CfgLeftPWM(100,35);
+ 152   1              CfgRightPWM(100,35);
+ 153   1              lf = 1;
+ 154   1              PWMout0 = lf;
+*** ERROR C214 IN LINE 154 OF TEST.C: illegal pointer conversion
+ 155   1              rf = 1;
+ 156   1              PWMout1 = &rf;
+*** ERROR C189 IN LINE 156 OF TEST.C: '&' on bit/sfr illegal
+ 157   1      }
+ 158          
+ 159          void left()
+ 160          {
+ 161   1              ClsPWM();
+ 162   1              lb = 1;
+ 163   1              rb = 1;
+ 164   1              lf = 1;
+ 165   1              CfgRightPWM(100,35);
+ 166   1              rf = 1;
+ 167   1              PWMout1 = &rf;
+*** ERROR C189 IN LINE 167 OF TEST.C: '&' on bit/sfr illegal
+ 168   1      }
+ 169          
+ 170          void right()
+ 171          {
+ 172   1              ClsPWM();
+ 173   1              lb = 1;
+ 174   1              rb = 1;
+ 175   1              rf = 1;
+ 176   1              CfgLeftPWM(100,35);
+C51 COMPILER V9.00   TEST                                                                  07/15/2017 14:05:30 PAGE 4   
+
+ 177   1              lf = 1;
+ 178   1              PWMout0 = &lf;
+*** ERROR C189 IN LINE 178 OF TEST.C: '&' on bit/sfr illegal
+ 179   1      }
+ 180          
+ 181          void left_fd()
+ 182          {}
+ 183          
+ 184          void right_fd()
+ 185          {}
+ 186          
+ 187          void back_f()
+ 188          { 
+ 189   1              ClsPWM();
+ 190   1              lf = 1;
+ 191   1              rf = 1;
+ 192   1              lb = 0;
+ 193   1              rb = 0;
+ 194   1      }
+ 195          
+ 196          void back_s()
+ 197          {
+ 198   1              ClsPWM();
+ 199   1              lf = 1;
+ 200   1              rf = 1;
+ 201   1              CfgLeftPWM(100,35);
+ 202   1              CfgRightPWM(100,35);
+ 203   1              lb = 1;
+ 204   1              PWMout0 = &lb;
+*** ERROR C189 IN LINE 204 OF TEST.C: '&' on bit/sfr illegal
+ 205   1              rb = 1;
+ 206   1              PWMout1 = &rb;
+*** ERROR C189 IN LINE 206 OF TEST.C: '&' on bit/sfr illegal
+ 207   1      }
+ 208          
+ 209          void left_bk()
+ 210          {}
+ 211          
+ 212          void right_bk()
+ 213          {}
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  6 ERROR(S)
